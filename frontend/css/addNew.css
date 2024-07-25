@@ -1,0 +1,139 @@
+.add-new-container {
+    display       : flex;
+    flex-direction: column;
+    max-width     : 720px;
+    margin        : 0 auto;
+    gap           : 20px;
+}
+
+.add-new-options {
+    display        : flex;
+    justify-content: space-between;
+    align-items    : center;
+    width          : 100%;
+    gap            : 20px;
+    height         : 300px;
+}
+
+.add-new-option {
+    width         : 50%;
+    font-size     : 20px;
+    background    : white;
+    text-align    : center;
+    min-height    : 90px;
+    font-weight   : 600;
+    border-radius : 10px;
+    box-shadow    : 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
+    padding       : 20px;
+    display       : flex;
+    flex-direction: column;
+    gap           : 10px;
+    align-items   : center;
+    color         : #111;
+    cursor        : pointer;
+    transition    : transform 0.3s ease, background-color 0.3s ease;
+}
+
+.add-new-option:hover {
+    transform       : scale(1.05);
+    background-color: rgba(177, 180, 177, 0.1);
+    width           : 50%;
+    font-size       : 20px;
+    font-weight     : 600;
+    border-radius   : 10px;
+    box-shadow      : 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
+    padding         : 20px;
+    display         : flex;
+    flex-direction  : column;
+    gap             : 10px;
+    align-items     : center;
+}
+
+.dark-theme .add-new-option:hover {
+    background-color: rgba(254, 251, 251, 0.858);
+
+}
+
+form {
+    margin        : 0 auto;
+    background    : white;
+    padding       : 20px;
+    border-radius : 8px;
+    box-shadow    : 0 4px 6px rgba(0, 0, 0, 0.1);
+    width         : 300px;
+    display       : flex;
+    flex-direction: column;
+    color         : #111
+}
+
+label {
+    display      : block;
+    margin-bottom: 8px;
+    font-weight  : 600;
+}
+
+input,
+textarea {
+    padding      : 10px;
+    margin-bottom: 20px;
+    border       : 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type='submit'] {
+    background: rgb(21, 163, 21);
+    color     : white;
+    cursor    : pointer;
+    margin-top: 20px;
+}
+
+input[type='submit']:hover {
+    background-color: green;
+    transition      : transform 0.3s ease, background-color 0.3s ease;
+}
+
+small {
+    display      : block;
+    margin-bottom: 20px;
+    color        : #ccc;
+}
+
+.file-upload {
+    border       : 2px dashed #ccc;
+    border-radius: 4px;
+    padding      : 20px;
+    text-align   : center;
+    cursor       : pointer;
+    transition   : background-color 0.3s;
+}
+
+.file-upload:hover {
+    background-color: #f0f0f0;
+}
+
+.upload-area {
+    display       : flex;
+    flex-direction: column;
+    align-items   : center;
+}
+
+.upload-icon {
+    width : 40px;
+    height: 40px;
+}
+
+.upload-area {
+    margin     : 0;
+    font-weight: bold;
+    color      : #938d8d;
+
+}
+
+select,
+textarea {
+    /* width        : 100%; */
+    padding      : 10px;
+    margin-bottom: 0 auto;
+    border       : 1px solid #ccc;
+    border-radius: 4px;
+}

@@ -1,0 +1,50 @@
+nav {
+    background-color: black;
+}
+
+
+.light-theme .nav-link {
+    color: white;
+}
+
+.light-theme .nav-link:hover {
+    background: #ccc;
+    color     : black;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dark-theme nav {
+    border-bottom: 1px solid lightblue;
+}
+
+
+.dark-theme .nav-items-container {
+    background-color: #111;
+}
+
+.dark-theme .nav-link {
+    color: lightblue;
+}
+
+.dark-theme .nav-link:hover {
+    background: #555;
+    color     : white;
+    transition: background-color 0.3s, color 0.3s;
+
+}
+
+/* Navigation bar styles */
+
+.nav-items-container {
+    margin   : 0 auto;
+    max-width: 720px;
+}
+
+.nav-link {
+    text-decoration: none;
+    padding        : 20px;
+    display        : inline-flex;
+    align-items    : center;
+    gap            : 10px;
+    cursor         : pointer;
+}
