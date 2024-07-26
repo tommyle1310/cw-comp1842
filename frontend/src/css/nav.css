@@ -3,7 +3,7 @@ nav {
 }
 
 
-.light-theme .nav-link {
+.nav-link {
     color: white;
 }
 
@@ -14,7 +14,7 @@ nav {
 }
 
 .dark-theme nav {
-    border-bottom: 1px solid lightblue;
+    border-bottom: 1px solid #7272d3;
 }
 
 
@@ -23,7 +23,7 @@ nav {
 }
 
 .dark-theme .nav-link {
-    color: lightblue;
+    color: #babadf;
 }
 
 .dark-theme .nav-link:hover {
