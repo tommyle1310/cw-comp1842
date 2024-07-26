@@ -1,14 +1,14 @@
 <template>
     <section class="add-new-container">
-        <h1>Which one do you want to add new?</h1>
+        <h1 style="text-align: center">Add New</h1>
         <div class="add-new-options">
-            <div class="add-new-option" @click="addType('word')">
+            <div :class="['add-new-option', type === 'word' ? 'active' : '']" @click="addType('word')">
                 Word with translations
                 <img src="https://res.cloudinary.com/dtwiu86jg/image/upload/v1721917965/translate-language-svgrepo-com_z8gnic.svg"
                     class="icon" alt="Icon" />
 
             </div>
-            <div class="add-new-option" @click="addType('language')">
+            <div :class="['add-new-option', type === 'language' ? 'active' : '']" @click="addType('language')">
                 Language
                 <img src="https://res.cloudinary.com/dtwiu86jg/image/upload/v1721917719/tskmhr3wh03jxblbwn9e.svg"
                     class="icon" alt="Icon" />
@@ -40,17 +40,18 @@
                 <form id="upload-form">
                     <div>
                         <label for="language-name">English word</label>
-                        <textarea type="text" cols="36" id="language-name" placeholder="ex: Cat" required></textarea>
+                        <textarea v-model="englishWord" type="text" cols="36" id="language-name" placeholder="ex: Cat"
+                            required></textarea>
                     </div>
                     <div id="textareas-container"></div>
-                    <select id="language-dropdown" language in langauges>
+                    <select id="language-dropdown" language in langauges @change="handleDropdownChange">
                         <option value="" disabled selected>Add more language to translate</option>
                         <option v-for="language in languages" :key="language.id" :value="language.id">
                             {{ language.name }}
                         </option>
 
                     </select>
-                    <input type="submit" value="Submit">
+                    <input type="submit" @click="addWord" value="Submit">
                 </form>
             </div>
         </div>
@@ -69,24 +70,74 @@ module.exports = {
     },
     data() {
         return {
-            type: ''
+            type: '',
+            englishWord: '',
+            translations: []
         }
     },
     methods: {
+        handleDropdownChange(event) {
+            const dropdown = event.target;
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            const selectedValue = selectedOption.value;
+            const selectedText = selectedOption.text;
+
+            if (selectedValue) {
+                // Create new div
+                const newDiv = document.createElement('div');
+
+                // Create new label
+                const newLabel = document.createElement('label');
+                newLabel.setAttribute('for', `language-${selectedValue}`);
+                newLabel.textContent = selectedText;
+
+                // Create new textarea
+                const newTextArea = document.createElement('textarea');
+                newTextArea.setAttribute('id', `language-${selectedValue}`);
+                newTextArea.setAttribute('cols', `36`);
+                newTextArea.required = true;
+
+                // Append label and textarea to the new div
+                newDiv.appendChild(newLabel);
+                newDiv.appendChild(newTextArea);
+
+                // Append new div to the textareas container
+                document.getElementById('textareas-container').appendChild(newDiv);
+
+                // Remove the selected option from the dropdown
+                dropdown.remove(dropdown.selectedIndex);
+
+                // Reset the dropdown to default state
+                dropdown.selectedIndex = 0;
+
+                // Hide dropdown if only one option remains
+                if (dropdown.options.length === 1) dropdown.style.display = 'none';
+            }
+        },
+
         addType(type) {
             if (type === 'word') {
                 this.type = 'word';
             } else if (type === 'language') {
                 this.type = 'language';
             }
-        }
+        },
+        onChangeEnglishWord(query) {
+            this.englishWord += query
+        },
+        onChangeTranslations(translationObj) {
+            // this.translations.push()
+            console.log(translationObj)
+        },
+        addWord(e) {
+            if (e) e.preventDefault(); // Prevent default behavior if e is defined
+            console.log('word:', this.englishWord);
+        },
+
     },
     computed: {
 
     },
-    mounted() {
-
-
-    }
+    mounted() { }
 }
 </script>

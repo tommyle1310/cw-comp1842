@@ -48,6 +48,43 @@
     align-items     : center;
 }
 
+.add-new-option.active {
+    transform       : scale(0.95);
+    background-color: rgba(119, 62, 254, 0.1);
+    width           : 50%;
+    font-size       : 20px;
+    border          : 1px solid rgb(128, 62, 243);
+    font-weight     : 600;
+    border-radius   : 10px;
+    box-shadow      : 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
+    padding         : 20px;
+    display         : flex;
+    flex-direction  : column;
+    gap             : 10px;
+    align-items     : center;
+}
+
+.dark-theme .add-new-option.active {
+    transform       : scale(0.95);
+    background-color: rgba(91, 31, 232, 0.1);
+    color           : #fff;
+    width           : 50%;
+    font-size       : 20px;
+    border          : 1px solid rgb(128, 62, 243);
+    font-weight     : 600;
+    border-radius   : 10px;
+    box-shadow      : 0px 0px 9px 0px rgba(0, 0, 0, 0.1);
+    padding         : 20px;
+    display         : flex;
+    flex-direction  : column;
+    gap             : 10px;
+    align-items     : center;
+}
+
+.dark-theme .add-new-option.active:hover {
+    color: #222;
+}
+
 .dark-theme .add-new-option:hover {
     background-color: rgba(254, 251, 251, 0.858);
 

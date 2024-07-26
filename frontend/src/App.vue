@@ -48,7 +48,8 @@ export default {
     async fetchLanguages() {
       try {
         const response = await axios.get('http://localhost:8000/language');
-        this.languages = response.data.data;
+        const filterEnglish = response.data.data.filter(item => item.name !== 'English')
+        this.languages = filterEnglish
       } catch (error) {
         console.error('Error fetching lagnuage:', error);
       }

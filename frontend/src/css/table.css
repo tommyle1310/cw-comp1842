@@ -59,7 +59,7 @@ h2 small {
   flex-basis: 20%;
 }
 
-@media all and (max-width: 1024px) {
+@media all and (max-width: 720px) {
 
   .responsive-table .table-header {
     display: none;
