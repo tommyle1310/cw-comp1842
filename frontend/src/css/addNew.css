@@ -33,6 +33,12 @@
     transition    : transform 0.3s ease, background-color 0.3s ease;
 }
 
+.dark-theme .add-new-option {
+    background: #babadf;
+}
+
+
+
 .add-new-option:hover {
     transform       : scale(1.05);
     background-color: rgba(177, 180, 177, 0.1);
@@ -102,10 +108,20 @@ form {
     color         : #111
 }
 
+.dark-theme form {
+    background: #babadf;
+}
+
 label {
     display      : block;
     margin-bottom: 8px;
     font-weight  : 600;
+}
+
+.dark-theme form input,
+textarea {
+    background: #d8d8de;
+    color     : #111
 }
 
 input,
@@ -117,7 +133,7 @@ textarea {
 }
 
 input[type='submit'] {
-    background: rgb(21, 163, 21);
+    background: rgb(21, 163, 21) !important;
     color     : white;
     cursor    : pointer;
     margin-top: 20px;

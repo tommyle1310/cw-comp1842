@@ -3,10 +3,10 @@
   <nav-bar :currentPage="currentPage" @update-page="updateCurrentPage"></nav-bar>
 
   <!-- table -->
-  <dict-table v-if="currentPage === 'home'"></dict-table>
+  <dict-table v-if="currentPage === 'home'" @update-page="updateCurrentPage"></dict-table>
 
   <!-- add new option - language or word -->
-  <add-new :languages="languages" v-if="currentPage === 'new'"></add-new>
+  <add-new @update-languages-child="updateLanguagesChild" :languages="languages" v-if="currentPage === 'new'"></add-new>
 
   <!-- about me -->
   <about-me v-if="currentPage === 'about-me'"></about-me>
@@ -54,66 +54,14 @@ export default {
         console.error('Error fetching lagnuage:', error);
       }
     },
+    updateLanguagesChild(newLanguages) {
+      this.languages = newLanguages;
+    }
   },
   mounted() {
     this.fetchLanguages();
-    // add language dropdown
-    document.getElementById('language-dropdown').addEventListener('change', function () {
-      const dropdown = this;
-      const selectedOption = dropdown.options[dropdown.selectedIndex];
-      const selectedValue = selectedOption.value;
-      const selectedText = selectedOption.text;
-
-      if (selectedValue) {
-        // Create new div
-        const newDiv = document.createElement('div');
-
-        // Create new label
-        const newLabel = document.createElement('label');
-        newLabel.setAttribute('for', `language-${selectedValue}`);
-        newLabel.textContent = selectedText;
-
-        // Create new textarea
-        const newTextArea = document.createElement('textarea');
-        newTextArea.setAttribute('id', `language-${selectedValue}`);
-        newTextArea.setAttribute('cols', `36`);
-        newTextArea.required = true;
-
-        // Append label and textarea to the new div
-        newDiv.appendChild(newLabel);
-        newDiv.appendChild(newTextArea);
-
-        // Append new div to the textareas container
-        document.getElementById('textareas-container').appendChild(newDiv);
-
-        // Remove the selected option from the dropdown
-        dropdown.remove(dropdown.selectedIndex);
-
-        // Reset the dropdown to default state
-        dropdown.selectedIndex = 0;
-      }
-      if (dropdown.options.length === 1) dropdown.style.display = 'none'
-    });
-
-
-
-
-    // file upload
-    document.getElementById('file-upload').addEventListener('click', function () {
-      document.getElementById('file-input').click();
-    });
-
-    document.getElementById('file-input').addEventListener('change', function (event) {
-      const uploadArea = document.querySelector('.upload-area');
-      if (event.target.files.length > 0) {
-        const fileName = event.target.files[0].name;
-        uploadArea.innerHTML = `<p>${fileName}</p>`;
-      }
-    });
   }
 }
-
-
 
 
 
