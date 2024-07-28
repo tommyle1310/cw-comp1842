@@ -13,13 +13,13 @@
             my knowledge and skills, and I am excited about the future possibilities in the field of programming.
         </p>
         <p>Feel free to connect with me through my <a href="mailto:tommyle1310@gmail.com" class="">email</a> or
-            check out my <a href="https://github.com/tommyle-1310" class="">GitHub</a> profile to see some of my
+            check out my <a href="https://github.com/tommyle1310" class="">GitHub</a> profile to see some of my
             work.</p>
     </section>
 </template>
 
 <script>
-module.exports = {
+export default {
     props: {
         // your props here
     },

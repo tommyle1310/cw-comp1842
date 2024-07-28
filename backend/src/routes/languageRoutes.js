@@ -1,10 +1,13 @@
 const { Router } = require('express')
-const { addLanguage, updateLanguage, getAllLanguages } = require('../controllers/language')
+const { addLanguage, updateLanguage, getAllLanguagesPagination, getAllLanguages, getSpecificLanguage, deleteLanguage } = require('../controllers/language')
 const router = Router()
 
 router.post('/', addLanguage)
 router.patch('/:languageId', updateLanguage)
-router.get('/', getAllLanguages)
+router.delete('/:languageId', deleteLanguage)
+router.get('/', getAllLanguagesPagination)
+router.get('/all', getAllLanguages)
+router.get('/specific/:languageId', getSpecificLanguage)
 
 
 module.exports = router

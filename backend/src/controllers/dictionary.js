@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Dictionary = require("../models/Dictionary");
 const Language = require("../models/Language");
 const { cr } = require('../utils/common');
@@ -23,7 +24,7 @@ const addWordWithTranslations = async (req, res) => {
             const { languageId, translationText } = translation;
 
             if (!languageId || !translationText) {
-                return res.status(400).json({ ...cr.invalid, message: 'Invalid translation data' });
+                return res.status(400).json({ ...cr.invalid, message: 'Please fill all the fields' });
             }
 
             // Check if the language exists
@@ -54,6 +55,13 @@ const getAllWords = async (req, res) => {
     const skip = (page - 1) * PAGE_SIZE; // Calculate the number of documents to skip
 
     try {
+        // Count the total number of documents in the Dictionary collection
+        const totalCount = await Dictionary.countDocuments();
+
+        // Calculate the total number of pages
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+        // Fetch the paginated words
         const words = await Dictionary.aggregate([
             { $skip: skip },
             { $limit: PAGE_SIZE },
@@ -105,8 +113,7 @@ const getAllWords = async (req, res) => {
             }
         ]);
 
-
-        return res.json({ ...cr.ok, words });
+        return res.json({ ...cr.ok, words, page: page, totalPages: totalPages });
     } catch (error) {
         console.error('Error retrieving words:', error);
         return res.status(500).json({ message: 'An error occurred while retrieving words.' });
@@ -183,8 +190,82 @@ const deleteWord = async (req, res) => {
     }
 };
 
+const getSpecificWord = async (req, res) => {
+    const { wordId } = req.params;
+
+    if (!wordId) {
+        return res.status(400).json({ ...cr.missing, message: 'Missing word ID' });
+    }
+
+    try {
+        // Aggregate the dictionary entry by ID
+        const words = await Dictionary.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(wordId) } },
+            {
+                $lookup: {
+                    from: 'languages',
+                    localField: 'translations.language',
+                    foreignField: '_id',
+                    as: 'languageDetails'
+                }
+            },
+            {
+                $unwind: '$translations'
+            },
+            {
+                $lookup: {
+                    from: 'languages',
+                    localField: 'translations.language',
+                    foreignField: '_id',
+                    as: 'languageDetail'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$languageDetail',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    word: { $first: '$word' },
+                    translations: {
+                        $push: {
+                            _id: '$translations._id',
+                            imgFlag: '$languageDetail.flag.url',
+                            name: '$languageDetail.name',
+                            translation: '$translations.translation'
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    word: 1,
+                    translations: 1
+                }
+            }
+        ]);
+
+        // Check if any word is found
+        if (words.length === 0) {
+            return res.status(404).json({ ...cr.notfound, message: 'Word not found' });
+        }
+
+        // Since aggregate returns an array, get the first element
+        const word = words[0];
+
+        return res.json({ ...cr.ok, word });
+    } catch (error) {
+        console.error('Error fetching word:', error);
+        return res.status(500).json({ message: 'An error occurred while fetching the word.' });
+    }
+};
+
 
 
 module.exports = {
-    addWordWithTranslations, getAllWords, updateWordWithTranslations, deleteWord
+    addWordWithTranslations, getAllWords, updateWordWithTranslations, deleteWord, getSpecificWord
 }

@@ -2,6 +2,8 @@ const cloudinary = require("../cloud")
 const Language = require("../models/Language")
 const { IncomingForm } = require('formidable');
 const { cr } = require("../utils/common");
+const { PAGE_SIZE } = require("../utils/constants");
+const Dictionary = require("../models/Dictionary");
 
 
 const addLanguage = async (req, res) => {
@@ -140,11 +142,94 @@ const updateLanguage = async (req, res) => {
 };
 
 
+const getAllLanguagesPagination = async (req, res) => {
+    try {
+        // Get the page and limit from the query parameters, defaulting to page 1 and limit 10
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || PAGE_SIZE;
+
+        // Calculate the number of items to skip
+        const skip = (page - 1) * limit;
+
+        // Fetch the total count of languages
+        const totalLanguages = await Language.countDocuments();
+
+        // Calculate the total number of pages
+        const totalPages = Math.ceil(totalLanguages / limit);
+
+        // Fetch the languages with pagination
+        const languages = await Language.find().skip(skip).limit(limit);
+
+        // Return the response with languages, totalPages, and currentPage
+        return res.json({
+            ...cr.ok,
+            data: languages,
+            totalPages,
+            page
+        });
+    } catch (error) {
+        console.error('Error fetching languages:', error);
+        return res.status(500).json({ ...cr.error, message: 'Internal Server Error' });
+    }
+};
+
+
 const getAllLanguages = async (req, res) => {
-    const languages = await Language.find()
-    return res.json({ ...cr.ok, data: languages })
-}
+    try {
+        const languages = await Language.find()
+
+        // Return the response with languages, totalPages, and currentPage
+        return res.json({
+            ...cr.ok,
+            languages
+        });
+    } catch (error) {
+        console.error('Error fetching languages:', error);
+        return res.status(500).json({ ...cr.error, message: 'Internal Server Error' });
+    }
+};
+const getSpecificLanguage = async (req, res) => {
+    const { languageId } = req.params
+    try {
+        const language = await Language.findById(languageId)
+        console.log('check langaugeas id', languageId);
+        if (!language) return res.status(404).json({ ...cr.notfound, message: 'Language not found' })
+        return res.json({
+            ...cr.ok,
+            language
+        });
+    } catch (error) {
+        console.error('Error fetching lagnuage:', error);
+        return res.status(500).json({ ...cr.error, message: 'Internal Server Error' });
+    }
+};
+
+const deleteLanguage = async (req, res) => {
+    const { languageId } = req.params;
+
+    if (!languageId) {
+        return res.status(400).json({ ...cr.missing, message: 'Missing language ID' });
+    }
+
+    try {
+        // Find the language by ID and remove it
+        const deletedLanguage = await Language.findByIdAndDelete(languageId);
+
+        if (!deletedLanguage) {
+            return res.status(404).json({ ...cr.notfound, message: 'Language not found' });
+        }
+
+        // Find and remove dictionary entries with translations referencing the deleted language
+        await Dictionary.deleteMany({ 'translations.language': languageId });
+
+        return res.json({ ...cr.ok, message: 'Language and related dictionary entries deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting language and related dictionary entries:', error);
+        return res.status(500).json({ message: 'An error occurred while deleting the language and related dictionary entries.' });
+    }
+};
+
 
 module.exports = {
-    addLanguage, getAllLanguages, updateLanguage
+    addLanguage, getAllLanguagesPagination, updateLanguage, getAllLanguages, getSpecificLanguage, deleteLanguage
 }

@@ -3,6 +3,13 @@
     flex-direction: column;
     max-width     : 720px;
     margin        : 0 auto;
+    padding-bottom: 20px;
+}
+
+.add-edit-language {
+    display        : flex;
+    justify-content: space-between;
+    align-items    : center;
 }
 
 .add-new-options {
@@ -108,7 +115,20 @@ form {
     color         : #111
 }
 
-.dark-theme form {
+.languages-display {
+    margin        : 0 auto;
+    background    : white;
+    padding       : 20px;
+    border-radius : 8px;
+    box-shadow    : 0 4px 6px rgba(0, 0, 0, 0.1);
+    width         : 300px;
+    display       : flex;
+    flex-direction: column;
+    color         : #111
+}
+
+
+.dark-theme languages-display {
     background: #babadf;
 }
 
@@ -188,4 +208,15 @@ textarea {
     margin-bottom: 0 auto;
     border       : 1px solid #ccc;
     border-radius: 4px;
+}
+
+.language-with-img {
+    display    : flex;
+    gap        : 5px;
+    align-items: center;
+}
+
+.existing-language-item {
+    margin-bottom: 10px;
+
 }

@@ -33,17 +33,32 @@
                     </div>
                     <input type="submit" @click="addLanguage" value="Submit">
                 </form>
+                <div class="languages-display">
+                    <h5>List existing languages</h5>
+                    <ul style="overflow-y:scroll; max-height: 200px;">
+                        <li class="language-with-img existing-language-item" v-for="language in listLanguages"
+                            :key="language.id" :value="language._id">
+                            <img class="icon" :src="language.flag.url">
+                            <div>{{ language.name }}</div>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
             <div v-if="type === 'word'" class="add-edit-word">
                 <form id="upload-form">
                     <div>
-                        <label for="english">English word</label>
+                        <label class="'language-with-img" for="english"><img class="icon"
+                                src='https://res.cloudinary.com/dtwiu86jg/image/upload/v1721917719/tskmhr3wh03jxblbwn9e.svg'>
+                            English word</label>
                         <textarea v-model="englishWord" type="text" cols="36" id="english" placeholder="ex: Cat"
                             required></textarea>
                     </div>
                     <div id="textareas-container">
                         <div v-for="(translation, index) in translations" :key="index">
-                            <label :for="translation._id">{{ translation.text }}</label>
+                            <label class="language-with-img" :for="translation._id"><img class="icon"
+                                    :src='translation.imgFlag'>{{ translation.text }}</label>
+
                             <textarea :id="translation._id" cols="36" @input="onChangeTranslations(index, $event)"
                                 required></textarea>
                         </div>
@@ -57,11 +72,16 @@
                 </form>
             </div>
         </div>
+        <CustomSpinner :loading="loading"></CustomSpinner>
     </section>
 </template>
 
 <script>
 import axios from 'axios'
+import { showToast } from '../js/toast.js'
+import '../css/toast.css'
+import CustomSpinner from '../components/spinner.vue'
+
 
 export default {
     props: {
@@ -70,18 +90,22 @@ export default {
             required: true
         }
     },
+    components: {
+        CustomSpinner,
+    },
     data() {
         return {
             type: '',
             englishWord: '',
             translations: [],
             languageName: '',
+            listLanguages: [],
+            loading: false,
             file: null
         }
     },
     watch: {
         type(newType) {
-            console.log('activate')
             if (newType === 'language') {
                 this.fileUpload(); // Ensure this is correctly triggering on file input change
             }
@@ -96,7 +120,7 @@ export default {
             if (selectedValue) {
                 const selectedLanguage = this.languages.find(lang => lang._id === selectedValue);
 
-                this.translations.push({ _id: selectedLanguage._id, value: selectedValue, text: selectedLanguage.name });
+                this.translations.push({ _id: selectedLanguage._id, value: selectedValue, text: selectedLanguage.name, imgFlag: selectedLanguage.flag.url });
 
                 let newArr = this.languages.filter(option => {
                     return option._id !== selectedValue;
@@ -118,26 +142,50 @@ export default {
             this.type = type;
         },
         async addWord(e) {
+            console.log(this.languages);
+            this.loading = true
             if (e) e.preventDefault();
             const arrTranslationReq = this.translations.map(item => ({
                 translationText: item.translationText,
                 languageId: item._id
             }));
+
             const dataToSubmit = {
                 word: this.englishWord,
                 translations: arrTranslationReq
             };
-
+            if (this.translations.length === 0) {
+                showToast('Please select at least one language for translating')
+                this.loading = false
+                return
+            }
             try {
                 const response = await axios.post('http://localhost:8000/dictionary', dataToSubmit);
-                console.log('check res', response);
+                console.log('check resx', response);
+                if (response.data.EC === 0) {
+                    showToast(`${this.englishWord} has just been added successfully`);
+                    this.$emit('refetch-languages');
+                    this.englishWord = ''
+                    this.translations = []
+                }
             } catch (error) {
                 console.error('Error adding word:', error);
+                if (error.response) {
+                    const { data } = error.response;
+                    this.errorMessage = data.message || 'An error occurred';
+
+                    showToast(`Error: ${this.errorMessage}`);
+                } else {
+                    showToast(this.errorMessage);
+                }
+                console.error('Error adding word:', error);
+            } finally {
+                this.loading = false;
             }
         },
         async addLanguage(e) {
             if (e) e.preventDefault();
-            console.log('check state', this.languageName, this.file);
+            this.loading = true
 
             if (this.file) {
                 // Create a new FormData object
@@ -151,12 +199,53 @@ export default {
                             'Content-Type': 'multipart/form-data',
                         },
                     });
-                    console.log('check res', response);
+
+                    if (response.data.EC === 0) {
+                        showToast(`${this.languageName} has just been added successfully`);
+
+                        this.$emit('refetch-languages');
+                        this.englishWord = ''
+                        this.translations = []
+                        this.languageName = ''
+                        this.file = null
+                        const uploadArea = document.querySelector('.upload-area');
+                        uploadArea.innerHTML = ` <i class="fa-solid fa-upload"></i>
+                                <p>Upload a File</p>`;
+
+                    } else {
+                        return
+                    }
                 } catch (error) {
                     console.error('Error adding language:', error);
+                    if (error.response) {
+                        const { data } = error.response;
+                        this.errorMessage = data.message || 'An error occurred';
+
+                        showToast(`Error: ${this.errorMessage}`);
+                    } else {
+                        showToast(this.errorMessage);
+                    }
+                    console.error('Error adding language:', error);
+                } finally {
+                    this.loading = false;
                 }
             } else {
-                console.log('No file selected');
+                showToast('Please add a flag image for this language')
+            }
+            this.loading = false
+        },
+        async fetchLanguages() {
+            this.loading = true
+            try {
+
+                const response = await axios.get(`http://localhost:8000/language/all`);
+                if (response.data.EC === 0) {
+                    this.listLanguages = response.data.languages
+                }
+            } catch (e) {
+                showToast('Something went wrong when fetching languages')
+            } finally {
+                this.loading =false
             }
         },
         triggerFileInput() {
@@ -171,6 +260,9 @@ export default {
                 uploadArea.innerHTML = `<p>${fileName}</p>`;
             }
         }
-    }
+    },
+    mounted() {
+        this.fetchLanguages();
+    },
 }
 </script>

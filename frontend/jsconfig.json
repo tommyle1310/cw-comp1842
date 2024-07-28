@@ -14,6 +14,13 @@
       "dom",
       "dom.iterable",
       "scripthost"
+    ],
+    "types": [
+      "estree",
+      "html-minifier-terser",
+      "node",
+      "normalize-package-data",
+      "parse-json"
     ]
   }
 }

@@ -85,6 +85,41 @@ h2 small {
   justify-content: center;
 }
 
+.language-display,
+.upload-form {
+  opacity   : 0;
+  transform : translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.language-display.v-enter-active,
+.upload-form.v-enter-active,
+.language-display.v-leave-active,
+.upload-form.v-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.language-display.v-enter,
+.language-display.v-leave-to,
+/* .v-leave-active for <2.1.8 */
+.upload-form.v-enter,
+.upload-form.v-leave-to {
+  /* .v-leave-active for <2.1.8 */
+  opacity  : 0;
+  transform: translateY(-20px);
+}
+
+.language-display.v-enter-to,
+.language-display.v-leave,
+/* .v-enter-active for <2.1.8 */
+.upload-form.v-enter-to,
+.upload-form.v-leave {
+  /* .v-enter-active for <2.1.8 */
+  opacity  : 1;
+  transform: translateY(0);
+}
+
+
 @media all and (max-width: 720px) {
 
   .responsive-table .table-header {
@@ -147,4 +182,24 @@ h2 small {
   display    : flex;
   gap        : 5px;
   align-items: center;
+}
+
+.change-table-type-btn {
+  border       : none;
+  box-shadow   : 0px 2px 2px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding      : 10px 20px;
+  margin       : 20px 0;
+  cursor       : pointer;
+  transition   : opacity 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.change-table-type-btn:hover {
+  background: #000;
+  color     : #fff;
+}
+
+.dark-theme .change-table-type-btn:hover {
+  background: #4a21a2;
+
 }
