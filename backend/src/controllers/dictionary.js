@@ -99,7 +99,8 @@ const getAllWords = async (req, res) => {
                             _id: '$translations._id',
                             imgFlag: '$languageDetail.flag.url',
                             name: '$languageDetail.name',
-                            translation: '$translations.translation'
+                            translation: '$translations.translation',
+                            languageId: '$translations.language'
                         }
                     }
                 }
@@ -235,7 +236,9 @@ const getSpecificWord = async (req, res) => {
                             _id: '$translations._id',
                             imgFlag: '$languageDetail.flag.url',
                             name: '$languageDetail.name',
-                            translation: '$translations.translation'
+                            translation: '$translations.translation',
+                            languageId: '$translations.language'
+
                         }
                     }
                 }

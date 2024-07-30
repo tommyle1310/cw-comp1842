@@ -87,6 +87,8 @@ export default {
     },
     updateLanguagesChild(newLanguages) {
       this.languages = newLanguages;
+      console.log('go here', newLanguages)
+
     }
   },
   mounted() {
@@ -95,12 +97,13 @@ export default {
       if (page >= 1 && page <= this.totalLanguagePages) {
         this.fetchLanguages(page);
       }
-      // Handle the page change here
     });
     eventBus.on('refetch-languages', () => {
       this.fetchLanguages()
-      // Handle the page change here
     });
+    eventBus.on('update-languages-child', (newValue) => {
+      this.updateLanguagesChild(newValue)
+    })
   },
   computed: {
     languagePages() {

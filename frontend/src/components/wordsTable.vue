@@ -20,8 +20,9 @@
         <div class="col col-3" data-label="Japanese">...</div>
         <div class="col col-4 table-action" data-label="Action">
           <button @click="viewWord(word.id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
-          <button @click="editWord(word.id)" class="action-button edit"><i class="fa-solid fa-pen"></i></button>
-          <button @click="isOpenModal = true; setCurrentSelectedId(word.id)" class="action-button delete"><i
+          <button @click="openModalEditWord(word.id)" class="action-button edit"><i
+              class="fa-solid fa-pen"></i></button>
+          <button @click="isOpenDeleteModal = true; setCurrentSelectedId(word.id)" class="action-button delete"><i
               class="fa-solid fa-trash"></i></button>
 
         </div>
@@ -34,7 +35,7 @@
       <li class="table-row">
         <div class="col col-full" data-label="English">Dictionary is empty, try <a
             style="font-weight: bold; text-decoration: underline; cursor: pointer" @click="navigateTo('new')">create</a>
-          more dictionary that you know...
+          some words that you know...
         </div>
       </li>
     </ul>
@@ -59,14 +60,21 @@
     </nav>
   </div>
 
-  <CustomModal :isOpen="isOpenModal" @close-modal="closeModal" :itemId="currentSelectedId" :dataModal="dataDeleteModal"
-    type="delete-word" @delete-word="deleteWord"></CustomModal>
+  <!-- edit modal -->
+  <CustomModal :isOpen="isOpenEditModal" @close-modal="closeModal" :itemId="currentSelectedId"
+    :dataModal="dataEditModal" type="edit-word" @edit-word="editWord"></CustomModal>
+
+
+  <!-- delete modal -->
+  <CustomModal :isOpen="isOpenDeleteModal" @close-modal="closeModal" :itemId="currentSelectedId"
+    :dataModal="dataDeleteModal" type="delete-word" @delete-word="deleteWord"></CustomModal>
 </template>
 
 <script>
 import { showToast } from '@/js/toast';
 import CustomModal from '../components/modal.vue'
 import axios from 'axios';
+import eventBus from '@/js/eventBus';
 
 
 export default {
@@ -95,11 +103,17 @@ export default {
   },
   data() {
     return {
-      isOpenModal: false,
+      isOpenDeleteModal: false,
+      isOpenEditModal: false,
       currentSelectedId: '',
       dataDeleteModal: {
-        btnTitle: 'Confirm'
-      }
+        btnTitle: 'Confirm',
+        title: 'Confirm deletion'
+      },
+      dataEditModal: {
+        btnTitle: 'Save',
+        title: 'Edit'
+      },
     }
   },
   components: {
@@ -107,7 +121,8 @@ export default {
   },
   methods: {
     closeModal() {
-      this.isOpenModal = false
+      this.isOpenDeleteModal = false
+      this.isOpenEditModal = false
     },
     setCurrentSelectedId(id) {
       this.currentSelectedId = id
@@ -130,7 +145,7 @@ export default {
         const response = await axios.delete(`http://localhost:8000/dictionary/${this.currentSelectedId}`);
         if (response.data.EC === 0) {
           showToast('Successfully deleted word')
-          this.$emit('refetch-words')
+          eventBus.emit('refetch-words')
         } else {
           showToast('Something went wrong while deleting word')
         }
@@ -141,6 +156,12 @@ export default {
         this.loading = false
       }
     },
+
+    openModalEditWord(id) {
+      this.currentSelectedId = id;
+      this.isOpenEditModal = true;
+    }
+
   }
 }
 </script>

@@ -46,3 +46,10 @@
         transform: translateY(0);
     }
 }
+
+
+.dark-theme .modal p,
+h2,
+span {
+    color: #111
+}

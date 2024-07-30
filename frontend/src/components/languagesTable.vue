@@ -10,20 +10,18 @@
                 </div>
                 <div class="col col-4">Action</div>
             </li>
-            <li class="table-row" v-for="language in languages" :key="language.id" :value="language._id">
+            <li class="table-row" v-for="language in languages" :key="language._id">
                 <div class="col col-1" data-label="Name">{{ language.name }}</div>
                 <div class="col col-2" data-label="Flag">
                     <img class="icon" :src="language.flag.url" :alt="language.name">
                 </div>
                 <div class="col col-4 table-action" data-label="Action">
-                    <button @click="viewLanguage(language._id)" class="action-button view"><i
-                            class="fa-solid fa-eye"></i></button>
-                    <button @click="editanguage(language._id)" class="action-button edit"><i
-                            class="fa-solid fa-pen"></i></button>
-                    <button @click="isOpenModal = true; setCurrentSelectedId(language._id)" class="action-button delete"><i
-                            class="fa-solid fa-trash"></i></button>
+                    <button @click="viewLanguage(language._id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
+                    <button @click="openEditModal(language._id)" class="action-button edit"><i class="fa-solid fa-pen"></i></button>
+                    <button @click="openDeleteModal(language._id)" class="action-button delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </li>
+            
         </ul>
         <ul class="responsive-table" v-else>
             <li class="table-header">
@@ -59,9 +57,15 @@
             </ul>
         </nav>
 
+        <!-- edit modal -->
+        <CustomModal :isOpen="isOpenEditModal" @close-modal="closeModal" :itemId="currentSelectedId"
+            :component="EditComponent" :dataModal="dataModal" type="edit-language" @edit-language="editLanguage">
+        </CustomModal>
 
-        <CustomModal :isOpen="isOpenModal" @close-modal="closeModal" :itemId="currentSelectedId"
-            :dataModal="dataDeleteModal" type="delete-language" @delete-language="deleteLanguage"></CustomModal>
+
+        <!-- delete modal -->
+        <CustomModal :isOpen="isOpenDeleteModal" @close-modal="closeModal" :itemId="currentSelectedId"
+            :dataModal="dataModal" type="delete-language" @delete-language="deleteLanguage"></CustomModal>
     </div>
 </template>
 
@@ -71,69 +75,57 @@ import CustomModal from '../components/modal.vue'
 import { showToast } from '@/js/toast.js';
 import axios from 'axios';
 
-
 export default {
     props: {
-        languages: {
-            type: Array,
-            required: true
-        },
         navigateTo: {
             type: Function,
             required: true
         },
-        currentLanguagePagination: {
-            type: Number,
-            required: true
-        },
-        languagePages: {
-            type: Array,
-            required: true
-        },
-        totalLanguagePages: {
-            type: Number,
-            required: true
-        },
-        itemsPerLanguagePage: {
-            type: Number,
-            required: true
-        }
     },
     components: {
         CustomModal,
     },
     data() {
         return {
-            isOpenModal: false,
+            isOpenDeleteModal: false,
+            isOpenEditModal: false,
+            languages: [],
             currentSelectedId: '',
-            dataDeleteModal: {
-                btnTitle: 'Confirm'
-            }
+            dataModal: {
+                btnTitle: '',
+                title: ''
+            },
+            currentLanguagePagination: 1,
+            totalLanguagePages: 1,
+            itemsPerLanguagePage: 5
         }
     },
     methods: {
-        closeModal() {
-            this.isOpenModal = false
-        },
-        changeLanguagePage(page) {
-            console.log(this.languagePages, page);
-            if (page >= 1 && page <= this.languagePages.length) {
-                eventBus.emit('change-language-page', page);
+        async fetchLanguages(page = 1) {
+            try {
+                const response = await axios.get(`http://localhost:8000/language?page=${page}&limit=${this.itemsPerLanguagePage}`);
+                const filterEnglish = response.data.data.filter(item => item.name !== 'English');
+                this.languages = filterEnglish;
+                this.totalLanguagePages = response.data.totalPages;
+                this.currentLanguagePagination = page; // Correct the pagination state
+            } catch (error) {
+                console.error('Error fetching language:', error);
             }
         },
+        closeModal() {
+            this.isOpenDeleteModal = false;
+            this.isOpenEditModal = false;
+
+        },
+        changeLanguagePage(page) {
+        if (page >= 1 && page <= this.totalLanguagePages) {
+            this.fetchLanguages(page); // Fetch languages for the selected page
+        }
+    },
         setCurrentSelectedId(id) {
             this.currentSelectedId = id
         },
         async viewLanguage(id) {
-            console.log('check id', id)
-        },
-        async editLanguage(id) {
-            console.log('check id', id)
-        },
-        async viewWord(id) {
-            console.log('check id', id)
-        },
-        async editWord(id) {
             console.log('check id', id)
         },
         async deleteLanguage() {
@@ -145,7 +137,7 @@ export default {
                     showToast('Successfully deleted language')
                     eventBus.emit('refetch-languages');
 
-                    this.$emit('refetch-words')
+                    eventBus.emit('refetch-words')
                 } else {
                     showToast('Something went wrong while deleting language')
                 }
@@ -156,7 +148,36 @@ export default {
                 this.loading = false
             }
         },
+        openDeleteModal(id) {
+            this.isOpenDeleteModal = true;
+            this.setCurrentSelectedId(id)
+            this.dataModal = {
+                title: 'Confirm deletion',
+                btnTitle: 'Confirm'
+            }
+        },
+        openEditModal(id) {
+            this.isOpenEditModal = true;
+            this.setCurrentSelectedId(id)
+            this.dataModal = {
+                title: 'Edit Language',
+                btnTitle: 'Save'
+            }
+        }
 
+    },
+    mounted() {
+        this.fetchLanguages();
+
+    },
+    computed: {
+        languagePages() {
+            const pages = [];
+            for (let i = 1; i <= this.totalLanguagePages; i++) {
+                pages.push(i);
+            }
+            return pages;
+        }
     }
 }
 </script>

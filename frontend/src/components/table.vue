@@ -14,7 +14,6 @@
       :languagePages="languagePages"
       :totalLanguagePages="totalLanguagePages"
       itemsPerLanguagePage="itemsPerLanguagePage"
-      @refetch-words="fetchWords"
       ></languages-table>
     </div>
   </section>
@@ -24,6 +23,7 @@
 import wordsTable from './wordsTable.vue';
 import languagesTable from './languagesTable.vue';
 import axios from 'axios'
+import eventBus from '@/js/eventBus';
 
 export default {
   name: 'DictTable',
@@ -116,13 +116,15 @@ export default {
       // Emit an event to the parent with the new page value
       this.$emit('update-page', page);
 
-      // Update the URL
       const url = `/${page}`;
       window.history.pushState({ page }, '', url);
     }
   },
   mounted() {
     this.fetchWords();
+    eventBus.on('refetch-words', () => {
+      this.fetchWords()
+    });
    
   },
   computed: {
