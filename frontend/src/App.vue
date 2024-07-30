@@ -87,7 +87,6 @@ export default {
     },
     updateLanguagesChild(newLanguages) {
       this.languages = newLanguages;
-      console.log('go here', newLanguages)
 
     }
   },

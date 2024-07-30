@@ -31,6 +31,8 @@
 
 
 <script>
+import eventBus from '@/js/eventBus';
+
 export default {
     props: {
         languageName: {
@@ -69,6 +71,9 @@ export default {
         addEditLanguage() {
             // Emit updated localLanguageName to parent before submitting
             this.$emit('update:languageName', this.localLanguageName);
+            eventBus.emit('fetch-dropdown-languages')
+            eventBus.emit('fetch-languages-add-dropdown')
+
             this.$emit('add-edit-language', this.localLanguageName);
         },
         onChangeInput(value) {

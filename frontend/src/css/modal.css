@@ -53,3 +53,9 @@ h2,
 span {
     color: #111
 }
+
+.view-word-container {
+    max-height   : 300px;
+    overflow-y   : auto;
+    /* background: red; */
+}

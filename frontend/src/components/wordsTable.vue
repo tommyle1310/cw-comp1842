@@ -19,7 +19,7 @@
         <div class="col col-2" data-label="Japanese">{{ word.language2 }}</div>
         <div class="col col-3" data-label="Japanese">...</div>
         <div class="col col-4 table-action" data-label="Action">
-          <button @click="viewWord(word.id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
+          <button @click="openModalViewWord(word.id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
           <button @click="openModalEditWord(word.id)" class="action-button edit"><i
               class="fa-solid fa-pen"></i></button>
           <button @click="isOpenDeleteModal = true; setCurrentSelectedId(word.id)" class="action-button delete"><i
@@ -68,6 +68,11 @@
   <!-- delete modal -->
   <CustomModal :isOpen="isOpenDeleteModal" @close-modal="closeModal" :itemId="currentSelectedId"
     :dataModal="dataDeleteModal" type="delete-word" @delete-word="deleteWord"></CustomModal>
+
+
+  <!-- view modal -->
+  <CustomModal :isOpen="isOpenViewModal" @close-modal="closeModal" :itemId="currentSelectedId"
+    :dataModal="dataViewModal" type="view-word"></CustomModal>
 </template>
 
 <script>
@@ -105,6 +110,7 @@ export default {
     return {
       isOpenDeleteModal: false,
       isOpenEditModal: false,
+      isOpenViewModal: false,
       currentSelectedId: '',
       dataDeleteModal: {
         btnTitle: 'Confirm',
@@ -113,6 +119,10 @@ export default {
       dataEditModal: {
         btnTitle: 'Save',
         title: 'Edit'
+      },
+      dataViewModal: {
+        btnTitle: 'Close',
+        title: ''
       },
     }
   },
@@ -123,6 +133,7 @@ export default {
     closeModal() {
       this.isOpenDeleteModal = false
       this.isOpenEditModal = false
+      this.isOpenViewModal = false
     },
     setCurrentSelectedId(id) {
       this.currentSelectedId = id
@@ -160,6 +171,10 @@ export default {
     openModalEditWord(id) {
       this.currentSelectedId = id;
       this.isOpenEditModal = true;
+    },
+    openModalViewWord(id) {
+      this.currentSelectedId = id;
+      this.isOpenViewModal = true;
     }
 
   }

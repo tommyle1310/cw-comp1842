@@ -3,8 +3,18 @@
         <div class="modal">
             <div v-if="!loading" class="modal-content">
                 <span class="close" @click="closeModal">&times;</span>
-                <h2>{{ dataModal.title }}</h2>
+                <h2>{{ dataModal.title || dataView.englishWord }}</h2>
                 <p v-html="message"></p>
+                <div v-if="type==='view-word'" class="view-word-container">
+                <div class="" v-for="item in dataView.translations" :key="item.id">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img :src="item.imgFlag" class="icon" alt="">
+                        <h5>{{item.name}}</h5>
+                    </div>
+                    <p class="translation">{{item.translation}}</p>
+                </div>
+            </div>
+
                 <div v-if="type === 'delete-word' || type === 'delete-language'">
 
                     <input v-model="query" type="text">
@@ -97,6 +107,23 @@ export default {
                 }
             }
             return null;
+        },
+        dataView() {
+            return {
+                englishWord: this.dataFetch.word,
+                translations: this.dataFetch.translations,
+                id: this.dataFetch._id,
+                name: this.dataFetch.name
+            }
+        },
+        message() {
+            if (this.type === 'delete-word' && this.dataFetch) {
+                return `Type <span style='font-weight: bold;'>${this.dataFetch.word}</span> to confirm deletion`;
+            } else if (this.type === 'delete-language' && this.dataFetch) {
+                return `Type <span style='font-weight: bold;'>${this.dataFetch.name}</span> to confirm deletion`;
+            } else {
+                return '';
+            }
         }
     },
 
@@ -130,10 +157,11 @@ export default {
         async fetchData() {
             this.loading = true;
             try {
-                if (this.type === 'delete-word' || this.type === 'edit-word') {
+                if (this.type === 'delete-word' || this.type === 'edit-word' || this.type === 'view-word') {
                     const response = await axios.get(`http://localhost:8000/dictionary/${this.itemId}`);
                     if (response.data.EC === 0) {
                         this.dataFetch = response.data.word;
+                        console.log('check ', this.dataFetch)
                     } else {
                         showToast('Something went wrong while fetching data');
                     }
@@ -325,7 +353,6 @@ export default {
         },
         updateLanguagesChild(newLanguages) {
             this.languages = newLanguages;
-            console.log('go here', newLanguages)
 
         },
         handleDropdownChange(updatedTranslations) {
@@ -342,9 +369,9 @@ export default {
                 if (newVal && this.type === 'edit-word') {
                     this.translations = newVal.translations;
                     console.log('check', this.translations)
-                    console.log('check lnauges',  this.languages.filter(item => !this.translations.some(other => other.name === item.name)))
-                    eventBus.emit('update-languages-child', this.languages.filter(item => !this.translations.some(other => other.name === item.name)) 
-                )
+                    console.log('check lnauges', this.languages.filter(item => !this.translations.some(other => other.name === item.name)))
+                    eventBus.emit('update-languages-child', this.languages.filter(item => !this.translations.some(other => other.name === item.name))
+                    )
                 }
             }
         },
@@ -357,6 +384,9 @@ export default {
 
     mounted() {
         this.fetchLanguages()
+        eventBus.on('fetch-dropdown-languages', () => {
+        this.fetchLanguages()
+        })
         eventBus.on('update-languages-child', (newValue) => {
             this.updateLanguagesChild(newValue)
         })

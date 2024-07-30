@@ -16,7 +16,6 @@
                     <img class="icon" :src="language.flag.url" :alt="language.name">
                 </div>
                 <div class="col col-4 table-action" data-label="Action">
-                    <button @click="viewLanguage(language._id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
                     <button @click="openEditModal(language._id)" class="action-button edit"><i class="fa-solid fa-pen"></i></button>
                     <button @click="openDeleteModal(language._id)" class="action-button delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
@@ -119,7 +118,7 @@ export default {
         },
         changeLanguagePage(page) {
         if (page >= 1 && page <= this.totalLanguagePages) {
-            this.fetchLanguages(page); // Fetch languages for the selected page
+            this.fetchLanguages(page); 
         }
     },
         setCurrentSelectedId(id) {
@@ -129,14 +128,14 @@ export default {
             console.log('check id', id)
         },
         async deleteLanguage() {
-            console.log('check id', this.currentSelectedId)
             this.loading = true
             try {
                 const response = await axios.delete(`http://localhost:8000/language/${this.currentSelectedId}`);
                 if (response.data.EC === 0) {
                     showToast('Successfully deleted language')
                     eventBus.emit('refetch-languages');
-
+                    eventBus.emit('fetch-languages-add-dropdown')
+                    this.fetchLanguages()
                     eventBus.emit('refetch-words')
                 } else {
                     showToast('Something went wrong while deleting language')

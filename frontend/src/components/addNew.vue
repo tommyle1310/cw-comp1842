@@ -68,12 +68,11 @@ export default {
     },
     methods: {
         handleDropdownChange(updatedTranslations) {
-            console.log('check', updatedTranslations);
             this.translations = updatedTranslations;
         },
         onChangeTranslations(index, newValue) {
-            console.log('check i', index, 'nv', newValue);
             this.translations[index].translationText = newValue;
+            // console.log('check i', index, 'nv', newValue, 'finaly', this.translations);
         },
         async fetchDropdownAddLanguages() {
             try {
@@ -92,10 +91,10 @@ export default {
         async addEditWord() {
             this.loading = true
             const arrTranslationReq = this.translations.map(item => ({
-                translationText: item.translationText,
+                translationText: item.translationText || item.translation,
                 languageId: item._id
             }));
-
+            console.log('check here', arrTranslationReq, 'check thistaranstlion:', this.translations);
             const dataToSubmit = {
                 word: this.englishWord,
                 translations: arrTranslationReq
@@ -109,8 +108,9 @@ export default {
                 const response = await axios.post('http://localhost:8000/dictionary', dataToSubmit);
                 console.log('check resx', response);
                 if (response.data.EC === 0) {
-                    showToast(`${this.englishWord} has just been added successfully`);
-                    this.$emit('refetch-languages');
+                    showToast(`${this.englishWord} has just been added successfully`)
+                    this.$emit('refetch-languages')
+                    this.fetchDropdownAddLanguages()
                     this.englishWord = ''
                     this.translations = []
                 }
@@ -159,6 +159,8 @@ export default {
                         this.englishWord = ''
                         this.translations = []
                         this.languageName = ''
+                    this.fetchDropdownAddLanguages()
+
                         this.file = null
                         const uploadArea = document.querySelector('.upload-area');
                         uploadArea.innerHTML = ` <i class="fa-solid fa-upload"></i>
@@ -225,6 +227,11 @@ export default {
         this.fetchDropdownAddLanguages()
         eventBus.on('update-languages-add-dropdown', (newValue) => {
             this.updateLanguagesAddDropdown(newValue)
+        })
+        eventBus.on('fetch-languages-add-dropdown', () => {
+            this.fetchDropdownAddLanguages()
+            console.log('check finally', this.languages);
+
         })
     },
 }

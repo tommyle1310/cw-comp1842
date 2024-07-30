@@ -96,3 +96,18 @@ a {
         transform: rotate(360deg);
     }
 }
+
+.jb {
+    display        : flex;
+    justify-content: space-between;
+    align-items    : center;
+}
+
+.dark-theme .view-word-container {
+    color: #111
+}
+
+.view-word-container .translation {
+    margin-top: -16px;
+    padding   : 0 10px;
+}
