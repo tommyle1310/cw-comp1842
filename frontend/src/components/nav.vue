@@ -2,7 +2,8 @@
     <nav>
         <div class="nav-items-container">
             <div class="search-container">
-                <input class="nav-search" v-model="query" @input="debouncedHandleSearch" placeholder="Search..." type="text" />
+                <input class="nav-search" v-model="query" @input="debouncedHandleSearch" placeholder="Search..."
+                    type="text" />
                 <div class="result-search" v-if="query">
                     <div v-for="result in listResultWords" :key="result._id">
                         {{ result.word }}
@@ -12,11 +13,17 @@
                     </div>
                 </div>
             </div>
-            <a @click="navigateTo('home')" class="nav-link"><i class="fa-solid fa-soap"></i>Home</a>
-            <a @click="navigateTo('new')" class="nav-link"><i class="fa-solid fa-circle-plus"></i>New</a>
-            <a @click="navigateTo('test')" class="nav-link"><i class="fa-solid fa-graduation-cap"></i>Test</a>
-            <a @click="navigateTo('about-me')" class="nav-link"><i class="fa-solid fa-address-card"></i>LP3336J-About me</a>
-            <a class="nav-link" @click="toggleTheme()"><i class="fa-solid fa-sun"></i><i class="fa-solid fa-moon"></i></a>
+            <a @click="navigateTo('home')" :class="{ 'nav-link': true, 'active': currentPage === 'home' }"><i
+                    class="fa-solid fa-soap"></i>Home</a>
+            <a @click="navigateTo('new')" :class="{ 'nav-link': true, 'active': currentPage === 'new' }"><i
+                    class="fa-solid fa-circle-plus"></i>New</a>
+            <a @click="navigateTo('test')" :class="{ 'nav-link': true, 'active': currentPage === 'test' }"><i
+                    class="fa-solid fa-graduation-cap"></i>Test</a>
+            <a @click="navigateTo('about-me')" :class="{ 'nav-link': true, 'active': currentPage === 'about-me' }"><i
+                    class="fa-solid fa-address-card"></i>LP3336J-About me</a>
+
+            <a class="nav-link" @click="toggleTheme()"><i class="fa-solid fa-sun"></i><i
+                    class="fa-solid fa-moon"></i></a>
         </div>
     </nav>
 </template>
@@ -35,7 +42,6 @@ module.exports = {
     },
     data() {
         return {
-            currentPage: 'home',
             query: '',
             listWords: [],
             listResultWords: [],
@@ -54,8 +60,10 @@ module.exports = {
 
             // Update the URL
             const url = `/${page}`;
+
             window.history.pushState({ page }, '', url);
-        },
+        }
+        ,
         handleSearch() {
             if (this.query === '') {
                 this.listResultWords = this.listWords;

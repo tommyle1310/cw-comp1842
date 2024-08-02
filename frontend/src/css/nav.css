@@ -4,7 +4,10 @@ nav {
 
 
 .nav-link {
-    color: white;
+    color          : white;
+    text-decoration: none;
+    padding        : 10px;
+    display        : inline-block;
 }
 
 .light-theme .nav-link:hover {
@@ -81,4 +84,10 @@ nav {
     flex-direction: column;
     max-height    : 500px;
     overflow-y    : auto;
+}
+
+.nav-link.active {
+    text-decoration: underline;
+    font-weight    : bold;
+    color          : #7272d3;
 }

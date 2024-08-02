@@ -17,7 +17,7 @@
       <li class="table-row" v-for="word in word2Display" :key="word._id" :value="word._id">
         <div class="col col-1" data-label="English">{{ word.english }}</div>
         <div class="col col-2" data-label="Japanese">{{ word.language2 }}</div>
-        <div class="col col-3" data-label="Japanese">...</div>
+        <div class="col col-3" data-label="Japanese" style="cursor: pointer; opacity: 0.8" @click="openModalViewWord(word.id)">...</div>
         <div class="col col-4 table-action" data-label="Action">
           <button @click="openModalViewWord(word.id)" class="action-button view"><i class="fa-solid fa-eye"></i></button>
           <button @click="openModalEditWord(word.id)" class="action-button edit"><i

@@ -1,20 +1,18 @@
 <template>
   <section>
     <div class="container">
-      <div style=" margin: 0 auto; width: 100%; display: flex; justify-content: center">
+      <div style=" margin: 0 auto;  gap: 10px;width: 100%; display: flex; justify-content: center">
         <button class="change-table-type-btn" @click="switchTab">{{ isDisplayWords ? 'Switch languages list' : 'Switch Dictionary list' }}</button>
+        <button v-if="isDisplayWords" @click="changeSortType" class="change-table-type-btn view">{{ sort === 'desc' ? 'DESC sort' : ((sort === 'asc') ? 'ASC sort' : 'Sort by latest')}}</button>
       </div>
-      
+
       <words-table v-if="isDisplayWords" :words="words" :word2Display="word2Display" :navigateTo="navigateTo"
         :currentPage="currentPage" :pages="pages" @refetch-words="fetchWords" @change-page="changePage"></words-table>
 
 
       <languages-table v-else :languages="languages" :navigateTo="navigateTo"
-      :currentLanguagePagination="currentLanguagePagination"
-      :languagePages="languagePages"
-      :totalLanguagePages="totalLanguagePages"
-      itemsPerLanguagePage="itemsPerLanguagePage"
-      ></languages-table>
+        :currentLanguagePagination="currentLanguagePagination" :languagePages="languagePages"
+        :totalLanguagePages="totalLanguagePages" itemsPerLanguagePage="itemsPerLanguagePage"></languages-table>
     </div>
   </section>
 </template>
@@ -68,13 +66,14 @@ export default {
       currentPage: 1,
       totalPages: 1,
       itemsPerPage: 10,
-      isDisplayWords: true
+      isDisplayWords: true,
+      sort: ''
     };
   },
   methods: {
-    async fetchWords(page = 1) {
+    async fetchWords(page = 1, sort = 'createdat') {
       try {
-        const response = await axios.get(`http://localhost:8000/dictionary?page=${page}&limit=${this.itemsPerPage}`);
+        const response = await axios.get(`http://localhost:8000/dictionary?page=${page}&limit=${this.itemsPerPage}&sort=${sort}`);
         const data = response.data;
         if (data.EC === 0) {
           this.words = data.words;
@@ -104,9 +103,22 @@ export default {
         console.error('Error fetching data:', error);
       }
     },
+
     switchTab() {
       this.isDisplayWords = !this.isDisplayWords;
     },
+    changeSortType() {
+      if (this.sort === 'asc') {
+        this.sort = 'desc';
+      } else if (this.sort === 'desc') {
+        this.sort = 'createdat';
+      } else {
+        this.sort = 'asc';
+      }
+      // Fetch words with the updated sort type
+      this.fetchWords(this.currentPage, this.sort);
+    },
+
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.fetchWords(page);
@@ -125,7 +137,7 @@ export default {
     eventBus.on('refetch-words', () => {
       this.fetchWords()
     });
-   
+
   },
   computed: {
     pages() {

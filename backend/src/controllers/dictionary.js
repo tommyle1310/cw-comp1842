@@ -53,10 +53,10 @@ const addWordWithTranslations = async (req, res) => {
 const getAllWordsPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Page number from query parameters, default is 1
     const skip = (page - 1) * PAGE_SIZE; // Calculate the number of documents to skip
-    const sort = req.query.sort || 'createdAt'; // Sort parameter from query parameters, default is 'createdAt'
+    const sort = req.query.sort || 'createdat'; // Sort parameter from query parameters, default is 'createdAt'
 
     let sortCriteria;
-    if (sort === 'createdAt') {
+    if (sort === 'createdat') {
         sortCriteria = { createdAt: -1 }; // Sort by creation date, newest first
     } else if (sort === 'asc') {
         sortCriteria = { word: 1 }; // Sort alphabetically, ascending
