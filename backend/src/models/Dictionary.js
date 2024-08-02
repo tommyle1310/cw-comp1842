@@ -19,6 +19,10 @@ const dictionarySchema = new mongoose.Schema({
         required: true,
     },
     translations: [translationSchema],
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 const Dictionary = mongoose.model('Dictionary', dictionarySchema);

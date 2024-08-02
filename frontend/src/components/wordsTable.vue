@@ -9,7 +9,7 @@
         </div>
         <div class="col col-2">
           {{ words[words.length - 1]?.translations?.[0]?.name || 'Default Name' }}
-          <img class="icon" :src="words[0].translations[0].imgFlag">
+          <img class="icon" :src="words[words.length - 1].translations[0].imgFlag">
         </div>
         <div class="col col-3">More</div>
         <div class="col col-4">Action</div>

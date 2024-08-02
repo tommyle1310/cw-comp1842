@@ -11,8 +11,11 @@
         </div>
         <div id="textareas-container">
             <div v-for="(translation, index) in localTranslations" :key="index">
-                <label class="language-with-img" :for="translation._id">
-                    <img class="icon" :src="translation.imgFlag">{{ translation.text || translation.name }}
+                <label style="display: flex; align-items: center;  justify-content: space-between" :for="translation._id">
+                    <div class="language-with-img">
+                        <img class="icon" :src="translation.imgFlag">{{ translation.text || translation.name }}
+                    </div>
+                    <button v-if="!dataEdit" style="align-self:end; padding: 5px 10px; border: 1px solid #ddd" @click="handleRemoveLanguage(translation._id || translation.id)" class="action-button">X</button>
                 </label>
                 <textarea :id="translation._id" cols="36" @input="onChangeTranslation($event, index)"
                     :value="translation.translationText || translation.translation" required></textarea>
@@ -75,6 +78,18 @@ export default {
                 event.target.selectedIndex = 0;
             }
         },
+        handleRemoveLanguage(languageId) {
+        const index = this.localTranslations.findIndex(t => t.languageId === languageId);
+        if (index !== -1) {
+            this.localTranslations.splice(index, 1);
+
+            this.$emit('update:translations', this.localTranslations);
+            eventBus.emit('update-languages-child', this.languages.filter(lang => !this.localTranslations.some(t => t.languageId === lang._id)));
+            eventBus.emit('update-languages-add-dropdown', this.languages.filter(lang => !this.localTranslations.some(t => t.languageId === lang._id)));
+            eventBus.emit('fetch-languages-add-dropdown')
+        }
+    },
+
 
         addEditWord() {
             this.$emit('update:englishWord', this.localWord);

@@ -5,15 +5,15 @@
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ dataModal.title || dataView.englishWord }}</h2>
                 <p v-html="message"></p>
-                <div v-if="type==='view-word'" class="view-word-container">
-                <div class="" v-for="item in dataView.translations" :key="item.id">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <img :src="item.imgFlag" class="icon" alt="">
-                        <h5>{{item.name}}</h5>
+                <div v-if="type === 'view-word'" class="view-word-container">
+                    <div class="" v-for="item in dataView.translations" :key="item.id">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img :src="item.imgFlag" class="icon" alt="">
+                            <h5>{{ item.name }}</h5>
+                        </div>
+                        <p class="translation">{{ item.translation }}</p>
                     </div>
-                    <p class="translation">{{item.translation}}</p>
                 </div>
-            </div>
 
                 <div v-if="type === 'delete-word' || type === 'delete-language'">
 
@@ -131,14 +131,14 @@ export default {
         onClickBtn() {
             if (this.type === 'delete-word') {
 
-                if (this.query === this.dataFetch?.word) {
+                if (this.query.trim() === this.dataFetch?.word.trim()) {
                     this.$emit(this.type);
                     this.$emit('close-modal');
                     this.query = '';
                     return;
                 }
             } else if (this.type === 'delete-language') {
-                if (this.query === this.dataFetch?.name) {
+                if (this.query.trim() === this.dataFetch?.name.trim()) {
                     this.$emit(this.type);
                     this.$emit('close-modal');
                     this.query = '';
@@ -385,7 +385,7 @@ export default {
     mounted() {
         this.fetchLanguages()
         eventBus.on('fetch-dropdown-languages', () => {
-        this.fetchLanguages()
+            this.fetchLanguages()
         })
         eventBus.on('update-languages-child', (newValue) => {
             this.updateLanguagesChild(newValue)

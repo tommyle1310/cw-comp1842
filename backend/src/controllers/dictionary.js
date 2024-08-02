@@ -50,9 +50,21 @@ const addWordWithTranslations = async (req, res) => {
     }
 };
 
-const getAllWords = async (req, res) => {
+const getAllWordsPagination = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Page number from query parameters, default is 1
     const skip = (page - 1) * PAGE_SIZE; // Calculate the number of documents to skip
+    const sort = req.query.sort || 'createdAt'; // Sort parameter from query parameters, default is 'createdAt'
+
+    let sortCriteria;
+    if (sort === 'createdAt') {
+        sortCriteria = { createdAt: -1 }; // Sort by creation date, newest first
+    } else if (sort === 'asc') {
+        sortCriteria = { word: 1 }; // Sort alphabetically, ascending
+    } else if (sort === 'desc') {
+        sortCriteria = { word: -1 }; // Sort alphabetically, descending
+    } else {
+        sortCriteria = { createdAt: -1 }; // Default to sorting by creation date, newest first
+    }
 
     try {
         // Count the total number of documents in the Dictionary collection
@@ -63,6 +75,7 @@ const getAllWords = async (req, res) => {
 
         // Fetch the paginated words
         const words = await Dictionary.aggregate([
+            { $sort: sortCriteria }, // Apply the sort criteria
             { $skip: skip },
             { $limit: PAGE_SIZE },
             {
@@ -120,6 +133,82 @@ const getAllWords = async (req, res) => {
         return res.status(500).json({ message: 'An error occurred while retrieving words.' });
     }
 };
+
+const getAllWords = async (req, res) => {
+    const sort = req.query.sort || 'createdAt'; // Sort parameter from query parameters, default is 'createdAt'
+
+    let sortCriteria;
+    if (sort === 'createdAt') {
+        sortCriteria = { createdAt: -1 }; // Sort by creation date, newest first
+    } else if (sort === 'asc') {
+        sortCriteria = { word: 1 }; // Sort alphabetically, ascending
+    } else if (sort === 'desc') {
+        sortCriteria = { word: -1 }; // Sort alphabetically, descending
+    } else {
+        sortCriteria = { createdAt: -1 }; // Default to sorting by creation date, newest first
+    }
+
+    try {
+
+        // Fetch the paginated words
+        const words = await Dictionary.aggregate([
+            { $sort: sortCriteria }, // Apply the sort criteria
+            {
+                $lookup: {
+                    from: 'languages',
+                    localField: 'translations.language',
+                    foreignField: '_id',
+                    as: 'languageDetails'
+                }
+            },
+            {
+                $unwind: '$translations'
+            },
+            {
+                $lookup: {
+                    from: 'languages',
+                    localField: 'translations.language',
+                    foreignField: '_id',
+                    as: 'languageDetail'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$languageDetail',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    word: { $first: '$word' },
+                    translations: {
+                        $push: {
+                            _id: '$translations._id',
+                            imgFlag: '$languageDetail.flag.url',
+                            name: '$languageDetail.name',
+                            translation: '$translations.translation',
+                            languageId: '$translations.language'
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    word: 1,
+                    translations: 1
+                }
+            }
+        ]);
+
+        return res.json({ ...cr.ok, words });
+    } catch (error) {
+        console.error('Error retrieving words:', error);
+        return res.status(500).json({ message: 'An error occurred while retrieving words.' });
+    }
+};
+
 
 const updateWordWithTranslations = async (req, res) => {
     const { wordId } = req.params
@@ -270,5 +359,6 @@ const getSpecificWord = async (req, res) => {
 
 
 module.exports = {
-    addWordWithTranslations, getAllWords, updateWordWithTranslations, deleteWord, getSpecificWord
+    addWordWithTranslations, getAllWords, updateWordWithTranslations, deleteWord, getSpecificWord,
+    getAllWordsPagination
 }
