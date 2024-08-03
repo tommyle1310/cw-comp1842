@@ -15,7 +15,6 @@
     :itemsPerLanguagePage="itemsPerLanguagePage"
   ></DictTable>
 
-  <!-- <WordsTable></WordsTable> -->
 
   <!-- add new option - language or word -->
   <add-new @update-languages-child="updateLanguagesChild" :languages="languages" v-if="currentPage === 'new'"></add-new>
@@ -43,7 +42,6 @@ import './js/toast.js';
 import NavBar from './components/nav.vue';
 import DictTable from './components/table.vue';
 import AddNew from './components/addNew.vue';
-// import WordsTable from './components/wordsTable.vue';
 import AboutMe from './components/aboutMe.vue';
 import eventBus from './js/eventBus';
 
@@ -54,7 +52,6 @@ export default {
     AddNew,
     AboutMe,
     NavBar,
-    // WordsTable
   },
   data() {
     return {

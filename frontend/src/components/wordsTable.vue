@@ -143,12 +143,6 @@ export default {
         this.$emit('change-page', page);
       }
     },
-    async viewWord(id) {
-      console.log('check id', id)
-    },
-    async editWord(id) {
-      console.log('check id', id)
-    },
     async deleteWord() {
       console.log('check id', this.currentSelectedId)
       this.loading = true

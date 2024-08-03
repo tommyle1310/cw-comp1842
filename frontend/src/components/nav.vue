@@ -5,11 +5,12 @@
                 <input class="nav-search" v-model="query" @input="debouncedHandleSearch" placeholder="Search..."
                     type="text" />
                 <div class="result-search" v-if="query">
-                    <div v-for="result in listResultWords" :key="result._id">
+                    <div v-for="result in listResultWords" class="item-search" :key="result._id" @click="openModalViewWord(result._id)">
                         {{ result.word }}
-                    </div>
-                    <div v-for="result in listResultLanguages" :key="result._id">
-                        {{ result.name }}
+                    </div> 
+                    <div v-for="result in listResultLanguages" class="item-search language-with-img" style="padding: 10px !important"  :key="result._id">
+                        <img :src="result.imgFlag || result.flag.url" class="icon" alt="">
+                        <h5>{{ result.name }}</h5>
                     </div>
                 </div>
             </div>
@@ -26,6 +27,12 @@
                     class="fa-solid fa-moon"></i></a>
         </div>
     </nav>
+    <CustomModal 
+:isOpen="isOpenViewModal" 
+@close-modal="closeModal" 
+:itemId="currentSelectedId" 
+:dataModal="dataViewModal" type="view-word">
+</CustomModal>
 </template>
 
 
@@ -33,6 +40,8 @@
 <script>
 const { showToast } = require('@/js/toast')
 const axios = require('axios')
+const CustomModal = require('../components/modal.vue')
+
 module.exports = {
     props: {
         currentPage: {
@@ -46,10 +55,27 @@ module.exports = {
             listWords: [],
             listResultWords: [],
             listLanguages: [],
-            listResultLanguages: []
+            listResultLanguages: [],
+            isOpenViewModal: false,
+            currentSelectedId: '',
+            dataViewModal: {
+                btnTitle: 'Close',
+                title: ''
+            },
         }
     },
+    components: {
+        CustomModal,
+    },
     methods: {
+        closeModal() {
+            this.isOpenViewModal = false
+        },
+        openModalViewWord(id) {
+            this.currentSelectedId = id;
+            this.isOpenViewModal = true;
+            console.log('should open', this.isOpenViewModal)
+        },
         // your methods here
         toggleTheme() {
             document.body.classList.toggle('dark-theme')
